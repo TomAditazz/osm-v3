@@ -20639,6 +20639,11 @@
 	        script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
 	        //script.async = true;
 	        document.body.appendChild(script);
+	        const scriptfile = document.createElement("script");
+
+	        scriptfile.src = "https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js";
+	        //script.async = true;
+	        document.body.appendChild(scriptfile);
 	        console.log(script);
 	    },
 	    componentDidMount() {
@@ -20694,6 +20699,8 @@
 	      React.createElement("div", {className: "col-sm-6"}, 
 	        React.createElement("div", {className: "col-sm-12"}, 
 	          React.createElement(Dropzonedemo, null), 
+	          React.createElement("a", {id: "export-png", class: "btn btn-default"}, 
+	            React.createElement("i", {class: "fa fa-download"}), " Download PNG"), 
 	          React.createElement("div", {id: "map", class: "map"}, 
 	            React.createElement("button", {type: "button", onClick: this.editMap}, "Edit Map"), 
 	            React.createElement("form", {class: "form-inline"}, 
@@ -20756,6 +20763,17 @@
 	          zoom: 13
 	        })
 	      });
+
+	      document.getElementById('export-png').addEventListener('click', function() {
+	        map.once('postcompose', function(event) {
+	          var canvas = event.context.canvas;
+	          canvas.toBlob(function(blob) {
+	            saveAs(blob, 'map.png');
+	          });
+	        });
+	        map.renderSync();
+	      });
+
 	    },
 
 	    render: function () {

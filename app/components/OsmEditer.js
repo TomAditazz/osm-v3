@@ -11,6 +11,11 @@ var OsmEditer = React.createClass({
         script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
         //script.async = true;
         document.body.appendChild(script);
+        const scriptfile = document.createElement("script");
+
+        scriptfile.src = "https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.3/FileSaver.min.js";
+        //script.async = true;
+        document.body.appendChild(scriptfile);
         console.log(script);
     },
     componentDidMount() {
@@ -66,6 +71,8 @@ var OsmEditer = React.createClass({
       <div className="col-sm-6">
         <div className="col-sm-12">
           <Dropzonedemo />
+          <a id="export-png" class="btn btn-default">
+            <i class="fa fa-download"></i> Download PNG</a>
           <div id="map" class="map">
             <button type="button" onClick={this.editMap}>Edit Map</button>  
             <form class="form-inline">

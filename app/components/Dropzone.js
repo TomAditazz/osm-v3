@@ -34,6 +34,17 @@ var DropzoneDemo = React.createClass({
           zoom: 13
         })
       });
+
+      document.getElementById('export-png').addEventListener('click', function() {
+        map.once('postcompose', function(event) {
+          var canvas = event.context.canvas;
+          canvas.toBlob(function(blob) {
+            saveAs(blob, 'map.png');
+          });
+        });
+        map.renderSync();
+      });
+
     },
 
     render: function () {

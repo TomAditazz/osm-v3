@@ -1,0 +1,22 @@
+{
+	"type":"FeatureCollection",
+	"features":[
+		{
+			"type":"Feature",
+			"id":"ZONE",
+			"properties":{"name":"Zone"},
+			"geometry":{
+				"type":"Polygon",
+				"coordinates":[
+					[
+						[-1.5701000, 50.8716300],
+						[-1.5616400, 50.8716300],
+						[-1.5616400, 50.8769800],
+						[-1.5701000, 50.8769800],
+						[-1.5701000, 50.8716300]
+					]
+				]
+			}
+		}
+	]
+}

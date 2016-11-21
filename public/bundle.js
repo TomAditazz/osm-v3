@@ -48,7 +48,7 @@
 	var ReactDom = __webpack_require__(158);
 	var ListContainer = __webpack_require__(159);
 	var OsmEditer = __webpack_require__(170);
-	var ShowOSM = __webpack_require__(173);
+	var ShowOSM = __webpack_require__(174);
 
 	var App = React.createClass({displayName: "App",
 	  render: function(){
@@ -20630,6 +20630,7 @@
 	var todoStore = __webpack_require__(162);
 	var todoActions = __webpack_require__(169);
 	var Dropzonedemo = __webpack_require__(171);
+	var Dropjsondemo = __webpack_require__(173);
 
 	var OsmEditer = React.createClass({displayName: "OsmEditer",
 	  
@@ -20658,16 +20659,16 @@
 	    },
 
 	    editMap(){
-	      var editorSource = new ol.source.Vector({
-	        url: "test.osm",
-	        format: new ol.format.OSMXML()
-	      });
+	      //var editorSource = new ol.source.Vector({
+	        //url: "scenario.geojson",
+	      //  format: new ol.format.GeoJSON()
+	      //});
 	     
-	      var editlayer = new ol.layer.Vector({
-	        source: editorSource,
-	        projection: 'EPSG:3857'
-	      })
-	      map.addLayer(editlayer);
+	      //editlayer = new ol.layer.Vector({
+	      //  source: editorSource,
+	      //  projection: 'EPSG:3857'
+	      //})
+	      //map.addLayer(editlayer);
 	      var typeSelect = document.getElementById('type');
 
 	      var draw; // global so we can remove it later
@@ -20675,7 +20676,7 @@
 	        var value = typeSelect.value;
 	        if (value !== 'None') {
 	          draw = new ol.interaction.Draw({
-	            source: editorSource,
+	            source: sSource,
 	            type: /** @type {ol.geom.GeometryType} */ (typeSelect.value)
 	          });
 	          map.addInteraction(draw);
@@ -20694,11 +20695,23 @@
 	      addInteraction();
 	    },
 
+	    exportMap(){
+	      var allFeatures = slayer.getSource().getFeatures();
+	      console.log(allFeatures);
+	      var format = new ol.format.GeoJSON();
+	      var routeFeatures = format.writeFeatures(allFeatures,{
+	        dataProjection: 'EPSG:4326',
+	        featureProjection: 'EPSG:3857'
+	      });
+	      console.log(routeFeatures);
+	    },
+
 	  render: function(){
 	    return (
 	      React.createElement("div", {className: "col-sm-6"}, 
 	        React.createElement("div", {className: "col-sm-12"}, 
 	          React.createElement(Dropzonedemo, null), 
+	          React.createElement(Dropjsondemo, null), 
 	          React.createElement("a", {id: "export-png", class: "btn btn-default"}, 
 	            React.createElement("i", {class: "fa fa-download"}), " Download PNG"), 
 	          React.createElement("div", {id: "map", class: "map"}, 
@@ -20712,7 +20725,7 @@
 	                React.createElement("option", {value: "Circle"}, "Circle"), 
 	                React.createElement("option", {value: "None"}, "None")
 	              ), 
-	              React.createElement("button", {type: "button"}, "Output Map")
+	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map")
 	            )
 	          )
 	        )
@@ -21242,6 +21255,47 @@
 
 /***/ },
 /* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var Dropzone = __webpack_require__(172);
+
+	var DropjsonDemo = React.createClass({displayName: "DropjsonDemo",
+	    onDrop: function (acceptedFiles, rejectedFiles) {
+	      console.log('Accepted files: ', acceptedFiles);
+	      console.log('Accepted files: ', acceptedFiles[0].preview);
+	      console.log('Rejected files: ', rejectedFiles);
+	            //Initialise the vector layer using OpenLayers.Format.OSM
+	      var lat=50.88;
+	      var lon=-1.54;
+	      var zoom=13;
+
+	      sSource = new ol.source.Vector({
+	        url: acceptedFiles[0].preview,
+	        format: new ol.format.GeoJSON(),
+	      });
+	      slayer = new ol.layer.Vector({
+	        source: sSource,
+	      });
+	      map.addLayer(slayer);
+	      console.log(slayer);
+	    },
+
+	    render: function () {
+	      return (
+	          React.createElement("div", null, 
+	            React.createElement(Dropzone, {onDrop: this.onDrop}, 
+	              React.createElement("div", null, "json files")
+	            )
+	          )
+	      );
+	    }
+	});
+
+	module.exports = DropjsonDemo;
+
+/***/ },
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);

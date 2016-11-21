@@ -3,9 +3,9 @@ var Dropzone = require('react-dropzone');
 
 var DropzoneDemo = React.createClass({
     onDrop: function (acceptedFiles, rejectedFiles) {
-      console.log('Accepted files: ', acceptedFiles);
-      console.log('Accepted files: ', acceptedFiles[0].preview);
-      console.log('Rejected files: ', rejectedFiles);
+      //console.log('Accepted files: ', acceptedFiles);
+      //console.log('Accepted files: ', acceptedFiles[0].preview);
+      //console.log('Rejected files: ', rejectedFiles);
             //Initialise the vector layer using OpenLayers.Format.OSM
       var lat=50.88;
       var lon=-1.54;

@@ -20633,7 +20633,8 @@
 	var Dropjsondemo = __webpack_require__(173);
 
 	var OsmEditer = React.createClass({displayName: "OsmEditer",
-	  
+
+
 	    componentWillMount() {
 	      const script = document.createElement("script");
 
@@ -20659,22 +20660,20 @@
 	    },
 
 	    editMap(){
-	      //var editorSource = new ol.source.Vector({
-	        //url: "scenario.geojson",
-	      //  format: new ol.format.GeoJSON()
-	      //});
-	     
-	      //editlayer = new ol.layer.Vector({
-	      //  source: editorSource,
-	      //  projection: 'EPSG:3857'
-	      //})
-	      //map.addLayer(editlayer);
 	      var typeSelect = document.getElementById('type');
-
+	      
 	      var draw; // global so we can remove it later
+	      var singleClick = new ol.interaction.Select({
+	            layers: [slayer],
+	      });
+	      
 	      function addInteraction() {
 	        var value = typeSelect.value;
-	        if (value !== 'None') {
+	        if(value == 'Select'){
+	          if(draw !== undefined) map.removeInteraction(draw);
+	          map.addInteraction(singleClick);
+	        }
+	        else if (value !== 'None') {
 	          draw = new ol.interaction.Draw({
 	            source: sSource,
 	            type: /** @type {ol.geom.GeometryType} */ (typeSelect.value)
@@ -20682,7 +20681,6 @@
 	          map.addInteraction(draw);
 	        }
 	      }
-
 
 	      /**
 	       * Handle change event.
@@ -20697,13 +20695,24 @@
 
 	    exportMap(){
 	      var allFeatures = slayer.getSource().getFeatures();
-	      console.log(allFeatures);
+	      //console.log(allFeatures);
 	      var format = new ol.format.GeoJSON();
 	      var routeFeatures = format.writeFeatures(allFeatures,{
 	        dataProjection: 'EPSG:4326',
 	        featureProjection: 'EPSG:3857'
 	      });
 	      console.log(routeFeatures);
+	    },
+
+	    modifyFeature(){
+	      var select = new ol.interaction.Select({
+	        layers: [slayer],
+	      });
+	      var modify = new ol.interaction.Modify({
+	        features: select.getFeatures(),
+	        source: sSource,
+	      });
+	      map.addInteractions(ol.interaction.defaults().extend([select, modify]));
 	    },
 
 	  render: function(){
@@ -20715,16 +20724,17 @@
 	          React.createElement("a", {id: "export-png", class: "btn btn-default"}, 
 	            React.createElement("i", {class: "fa fa-download"}), " Download PNG"), 
 	          React.createElement("div", {id: "map", class: "map"}, 
-	            React.createElement("button", {type: "button", onClick: this.editMap}, "Edit Map"), 
+	            React.createElement("button", {type: "button", onClick: this.editMap}, "Add Feature"), 
 	            React.createElement("form", {class: "form-inline"}, 
 	              React.createElement("label", null, "Geometry type  "), 
 	              React.createElement("select", {id: "type"}, 
+	                React.createElement("option", {value: "Select"}, "Select"), 
 	                React.createElement("option", {value: "Point"}, "Point"), 
 	                React.createElement("option", {value: "LineString"}, "LineString"), 
 	                React.createElement("option", {value: "Polygon"}, "Polygon"), 
-	                React.createElement("option", {value: "Circle"}, "Circle"), 
 	                React.createElement("option", {value: "None"}, "None")
 	              ), 
+	              React.createElement("button", {type: "button", onClick: this.modifyFeature}, "Edit Feature"), 
 	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map")
 	            )
 	          )
@@ -20745,9 +20755,9 @@
 
 	var DropzoneDemo = React.createClass({displayName: "DropzoneDemo",
 	    onDrop: function (acceptedFiles, rejectedFiles) {
-	      console.log('Accepted files: ', acceptedFiles);
-	      console.log('Accepted files: ', acceptedFiles[0].preview);
-	      console.log('Rejected files: ', rejectedFiles);
+	      //console.log('Accepted files: ', acceptedFiles);
+	      //console.log('Accepted files: ', acceptedFiles[0].preview);
+	      //console.log('Rejected files: ', rejectedFiles);
 	            //Initialise the vector layer using OpenLayers.Format.OSM
 	      var lat=50.88;
 	      var lon=-1.54;

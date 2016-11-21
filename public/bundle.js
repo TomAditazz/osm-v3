@@ -20634,7 +20634,6 @@
 
 	var OsmEditer = React.createClass({displayName: "OsmEditer",
 
-
 	    componentWillMount() {
 	      const script = document.createElement("script");
 
@@ -20661,17 +20660,21 @@
 
 	    editMap(){
 	      var typeSelect = document.getElementById('type');
-	      
-	      var draw; // global so we can remove it later
-	      var singleClick = new ol.interaction.Select({
+	      draw = new ol.interaction.Draw({
+	                    source: sSource,
+	      });
+	      //var draw; // global so we can remove it later
+	      single = new ol.interaction.Select({
 	            layers: [slayer],
 	      });
-	      
+	      this.modifyFeature();
 	      function addInteraction() {
 	        var value = typeSelect.value;
+	        if(modify !== undefined) map.removeInteraction(modify);
 	        if(value == 'Select'){
+	          console.log(draw);
 	          if(draw !== undefined) map.removeInteraction(draw);
-	          map.addInteraction(singleClick);
+	          map.addInteraction(single);
 	        }
 	        else if (value !== 'None') {
 	          draw = new ol.interaction.Draw({
@@ -20705,14 +20708,16 @@
 	    },
 
 	    modifyFeature(){
-	      var select = new ol.interaction.Select({
+	      select = new ol.interaction.Select({
 	        layers: [slayer],
 	      });
-	      var modify = new ol.interaction.Modify({
+	      modify = new ol.interaction.Modify({
 	        features: select.getFeatures(),
-	        source: sSource,
 	      });
-	      map.addInteractions(ol.interaction.defaults().extend([select, modify]));
+	      map.removeInteraction(draw);
+
+	      map.addInteraction(select);
+	      map.addInteraction(modify);
 	    },
 
 	  render: function(){
@@ -20728,11 +20733,11 @@
 	            React.createElement("form", {class: "form-inline"}, 
 	              React.createElement("label", null, "Geometry type  "), 
 	              React.createElement("select", {id: "type"}, 
+	                React.createElement("option", {value: "None"}, "None"), 
 	                React.createElement("option", {value: "Select"}, "Select"), 
 	                React.createElement("option", {value: "Point"}, "Point"), 
 	                React.createElement("option", {value: "LineString"}, "LineString"), 
-	                React.createElement("option", {value: "Polygon"}, "Polygon"), 
-	                React.createElement("option", {value: "None"}, "None")
+	                React.createElement("option", {value: "Polygon"}, "Polygon")
 	              ), 
 	              React.createElement("button", {type: "button", onClick: this.modifyFeature}, "Edit Feature"), 
 	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map")
@@ -21272,9 +21277,9 @@
 
 	var DropjsonDemo = React.createClass({displayName: "DropjsonDemo",
 	    onDrop: function (acceptedFiles, rejectedFiles) {
-	      console.log('Accepted files: ', acceptedFiles);
-	      console.log('Accepted files: ', acceptedFiles[0].preview);
-	      console.log('Rejected files: ', rejectedFiles);
+	      //console.log('Accepted files: ', acceptedFiles);
+	      //console.log('Accepted files: ', acceptedFiles[0].preview);
+	      //console.log('Rejected files: ', rejectedFiles);
 	            //Initialise the vector layer using OpenLayers.Format.OSM
 	      var lat=50.88;
 	      var lon=-1.54;
@@ -21288,7 +21293,7 @@
 	        source: sSource,
 	      });
 	      map.addLayer(slayer);
-	      console.log(slayer);
+	      //console.log(slayer);
 	    },
 
 	    render: function () {

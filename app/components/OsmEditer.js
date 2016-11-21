@@ -6,7 +6,6 @@ var Dropjsondemo = require('./Dropjson.js');
 
 var OsmEditer = React.createClass({
 
-
     componentWillMount() {
       const script = document.createElement("script");
 
@@ -33,17 +32,21 @@ var OsmEditer = React.createClass({
 
     editMap(){
       var typeSelect = document.getElementById('type');
-      
-      var draw; // global so we can remove it later
-      var singleClick = new ol.interaction.Select({
+      draw = new ol.interaction.Draw({
+                    source: sSource,
+      });
+      //var draw; // global so we can remove it later
+      single = new ol.interaction.Select({
             layers: [slayer],
       });
-      
+      this.modifyFeature();
       function addInteraction() {
         var value = typeSelect.value;
+        if(modify !== undefined) map.removeInteraction(modify);
         if(value == 'Select'){
+          console.log(draw);
           if(draw !== undefined) map.removeInteraction(draw);
-          map.addInteraction(singleClick);
+          map.addInteraction(single);
         }
         else if (value !== 'None') {
           draw = new ol.interaction.Draw({
@@ -77,14 +80,16 @@ var OsmEditer = React.createClass({
     },
 
     modifyFeature(){
-      var select = new ol.interaction.Select({
+      select = new ol.interaction.Select({
         layers: [slayer],
       });
-      var modify = new ol.interaction.Modify({
+      modify = new ol.interaction.Modify({
         features: select.getFeatures(),
-        source: sSource,
       });
-      map.addInteraction(ol.interaction.defaults().extend([select, modify]));
+      map.removeInteraction(draw);
+
+      map.addInteraction(select);
+      map.addInteraction(modify);
     },
 
   render: function(){
@@ -96,16 +101,17 @@ var OsmEditer = React.createClass({
           <a id="export-png" class="btn btn-default">
             <i class="fa fa-download"></i> Download PNG</a>
           <div id="map" class="map">
-            <button type="button" onClick={this.editMap}>Add Feature</button>  
+            <button type="button" onClick={this.editMap}>Edit Map</button>  
             <form class="form-inline">
               <label>Geometry type &nbsp;</label>
               <select id="type">
+                <option value="None">None</option>
                 <option value="Select">Select</option>
                 <option value="Point">Point</option>
                 <option value="LineString">LineString</option>
                 <option value="Polygon">Polygon</option>
-                <option value="None">None</option>
               </select>
+              <button type="button" onClick={this.modifyFeature}>Edit Feature</button>  
               <button type="button" onClick={this.exportMap}>Output Map</button>
             </form>
           </div>

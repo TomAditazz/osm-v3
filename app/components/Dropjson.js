@@ -3,6 +3,7 @@ var Dropzone = require('react-dropzone');
 
 var DropjsonDemo = React.createClass({
     onDrop: function (acceptedFiles, rejectedFiles) {
+
       //console.log('Accepted files: ', acceptedFiles);
       //console.log('Accepted files: ', acceptedFiles[0].preview);
       //console.log('Rejected files: ', rejectedFiles);
@@ -23,6 +24,7 @@ var DropjsonDemo = React.createClass({
     },
 
     render: function () {
+
       return (
           <div>
             <Dropzone onDrop={this.onDrop}>

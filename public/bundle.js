@@ -20718,6 +20718,7 @@
 
 	    modifyFeature(){
 	      map.un('click', choose2del);
+	      map.un('click', choose2rename);
 	      map.removeInteraction(interactions);
 	      select = new ol.interaction.Select({
 	            layers: [slayer],
@@ -20744,6 +20745,7 @@
 	    },
 
 	    delFeature(){
+	      map.un('click', choose2rename);
 	      var popup = new ol.Overlay.Popup();
 	      map.addOverlay(popup);
 	      select = new ol.interaction.Select({
@@ -20784,29 +20786,45 @@
 	    },
 
 	    renameFeature(){
+	      map.un('click', choose2del);
 	      var popup = new ol.Overlay.Popup();
 	      map.addOverlay(popup);
 	      select = new ol.interaction.Select({
 	        layers: [slayer],
 	      });
 	      map.addInteraction(select);
+	      doRename = function(){
+	        console.log("hello");
+	        popup.hide();
+	      };
 	      choose2rename = function (evt) {
 	        var feature = map.forEachFeatureAtPixel(evt.pixel,
 	        function (feature, slayer) {
 	            SelectedFeature = feature;
+
 	            var el = document.createElement("div");
+
 	            var title = document.createElement("h3");
 	            title.innerHTML = 'Rename: ';
 	            el.appendChild(title);
-	            var content = document.createElement("div");
-	            content.innerHTML = '<input type="text" placeholder={feature.getProperties().name}/>';
-	            el.appendChild(content);
+
+	            var input = document.createElement("input");
+	            var name = SelectedFeature.getProperties().name;
+	            input.setAttribute("placeholder", name);
+	            el.appendChild(input);
+
+	            var btn = document.createElement("button");
+	            btn.setAttribute("onClick", doRename);
+	            el.appendChild(btn);
+
 	            popup.show(evt.coordinate, el);
+
 	            console.log(feature.featureID);
 	        }, null, function(layer){
 	            return layer == slayer;
 	        });
 	      };
+
 	      map.on('click', choose2rename);
 
 	    },

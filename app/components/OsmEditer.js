@@ -32,6 +32,8 @@ var OsmEditer = React.createClass({
 
     editMap(){
       map.removeInteraction(select);
+      map.un('click', choose2del);
+      map.un('click', choose2rename);
       var typeSelect = document.getElementById('type');
       interactions = new ol.interaction.Draw({
         source: sSource,
@@ -50,11 +52,11 @@ var OsmEditer = React.createClass({
           });
           interactions.on('drawend', function (e) {
             var id = Math.floor((1 + Math.random()) * 0x10000).toString(16);
-            var type = (typeSelect.value == 'Polygon') ? 'Zoon' : 'Street';
+            var type = (typeSelect.value == 'Polygon') ? 'Zone' : 'Road';
             e.feature.featureID = id;
             e.feature.setProperties({
                 'id': id,
-                'name': 'new zone',
+                'name': 'new ' + type,
                 'type': type
             })
             console.log(e.feature.getProperties());
@@ -110,6 +112,7 @@ var OsmEditer = React.createClass({
 
     moveFeature(){
       map.un('click', choose2del);
+      map.un('click', choose2rename);
       map.removeInteraction(interactions);
       map.removeInteraction(select);
       select = new ol.interaction.Select({
@@ -156,6 +159,7 @@ var OsmEditer = React.createClass({
           if (action) {
               //alert('You choose: ' + action);
               popup.hide();
+              //map.removeOverlay(popup);
               if (action === 'yes') {
                 console.log(SelectedFeature);
                 select.getFeatures().remove(SelectedFeature);
@@ -203,6 +207,7 @@ var OsmEditer = React.createClass({
               });
               console.log("hello");
               popup.hide();
+              //map.removeOverlay(popup);
               select.getFeatures().remove(SelectedFeature);
             };
 
@@ -234,7 +239,7 @@ var OsmEditer = React.createClass({
               <label>Add &nbsp;</label>
               <select id="type">
                 <option value="Pan">Pan</option>
-                <option value="LineString">Street</option>
+                <option value="LineString">Road</option>
                 <option value="Polygon">Zone</option>
               </select>
               <button type="button" onClick={this.modifyFeature}>Edit Feature</button>

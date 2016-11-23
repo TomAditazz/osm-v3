@@ -20660,6 +20660,8 @@
 
 	    editMap(){
 	      map.removeInteraction(select);
+	      map.un('click', choose2del);
+	      map.un('click', choose2rename);
 	      var typeSelect = document.getElementById('type');
 	      interactions = new ol.interaction.Draw({
 	        source: sSource,
@@ -20678,11 +20680,11 @@
 	          });
 	          interactions.on('drawend', function (e) {
 	            var id = Math.floor((1 + Math.random()) * 0x10000).toString(16);
-	            var type = (typeSelect.value == 'Polygon') ? 'Zoon' : 'Street';
+	            var type = (typeSelect.value == 'Polygon') ? 'Zone' : 'Road';
 	            e.feature.featureID = id;
 	            e.feature.setProperties({
 	                'id': id,
-	                'name': 'new zone',
+	                'name': 'new ' + type,
 	                'type': type
 	            })
 	            console.log(e.feature.getProperties());
@@ -20784,6 +20786,7 @@
 	          if (action) {
 	              //alert('You choose: ' + action);
 	              popup.hide();
+	              //map.removeOverlay(popup);
 	              if (action === 'yes') {
 	                console.log(SelectedFeature);
 	                select.getFeatures().remove(SelectedFeature);
@@ -20831,6 +20834,7 @@
 	              });
 	              console.log("hello");
 	              popup.hide();
+	              //map.removeOverlay(popup);
 	              select.getFeatures().remove(SelectedFeature);
 	            };
 
@@ -20862,7 +20866,7 @@
 	              React.createElement("label", null, "Add  "), 
 	              React.createElement("select", {id: "type"}, 
 	                React.createElement("option", {value: "Pan"}, "Pan"), 
-	                React.createElement("option", {value: "LineString"}, "Street"), 
+	                React.createElement("option", {value: "LineString"}, "Road"), 
 	                React.createElement("option", {value: "Polygon"}, "Zone")
 	              ), 
 	              React.createElement("button", {type: "button", onClick: this.modifyFeature}, "Edit Feature"), 

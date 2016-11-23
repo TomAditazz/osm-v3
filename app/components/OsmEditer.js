@@ -50,12 +50,14 @@ var OsmEditer = React.createClass({
           });
           interactions.on('drawend', function (e) {
             var id = Math.floor((1 + Math.random()) * 0x10000).toString(16);
+            var type = (typeSelect.value == 'Polygon') ? 'Zoon' : 'Street';
             e.feature.featureID = id;
             e.feature.setProperties({
                 'id': id,
                 'name': 'new zone',
+                'type': type
             })
-            console.log(e.feature);
+            console.log(e.feature.getProperties());
             document.getElementById("type").selectedIndex = 0;
             map.removeInteraction(interactions);
           });

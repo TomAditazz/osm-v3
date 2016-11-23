@@ -20633,6 +20633,8 @@
 	var Dropjsondemo = __webpack_require__(173);
 	var choose2del;
 	var choose2rename;
+	var select;
+	var interactions;
 
 	var OsmEditer = React.createClass({displayName: "OsmEditer",
 
@@ -20657,6 +20659,7 @@
 	    },
 
 	    editMap(){
+	      map.removeInteraction(select);
 	      var typeSelect = document.getElementById('type');
 	      interactions = new ol.interaction.Draw({
 	        source: sSource,
@@ -20720,19 +20723,21 @@
 	      map.un('click', choose2del);
 	      map.un('click', choose2rename);
 	      map.removeInteraction(interactions);
+	      map.removeInteraction(select);
 	      select = new ol.interaction.Select({
 	            layers: [slayer],
 	      });
 	      interactions = new ol.interaction.Modify({
 	        features: select.getFeatures(),
 	      });
-	            map.addInteraction(select);
+	      map.addInteraction(select);
 	      map.addInteraction(interactions);
 	    },
 
 	    moveFeature(){
 	      map.un('click', choose2del);
 	      map.removeInteraction(interactions);
+	      map.removeInteraction(select);
 	      select = new ol.interaction.Select({
 	            layers: [slayer],
 	      });
@@ -20746,6 +20751,8 @@
 
 	    delFeature(){
 	      map.un('click', choose2rename);
+	      map.removeInteraction(select);
+	      map.removeInteraction(interactions);
 	      var popup = new ol.Overlay.Popup();
 	      map.addOverlay(popup);
 	      select = new ol.interaction.Select({
@@ -20787,6 +20794,8 @@
 
 	    renameFeature(){
 	      map.un('click', choose2del);
+	      map.removeInteraction(select);
+	      map.removeInteraction(interactions);
 	      var popup = new ol.Overlay.Popup();
 	      map.addOverlay(popup);
 	      select = new ol.interaction.Select({
@@ -20845,15 +20854,14 @@
 	        React.createElement("div", {className: "col-sm-12"}, 
 	          React.createElement(Dropzonedemo, null), 
 	          React.createElement(Dropjsondemo, null), 
-	          React.createElement("div", {id: "map", class: "map"}, 
+	          React.createElement("div", {id: "map"}, 
 	            React.createElement("button", {type: "button", onClick: this.editMap}, "Edit Map"), 
 	            React.createElement("form", {class: "form-inline"}, 
 	              React.createElement("label", null, "Add  "), 
 	              React.createElement("select", {id: "type"}, 
 	                React.createElement("option", {value: "Pan"}, "Pan"), 
-	                React.createElement("option", {value: "Point"}, "Point"), 
-	                React.createElement("option", {value: "LineString"}, "LineString"), 
-	                React.createElement("option", {value: "Polygon"}, "Polygon")
+	                React.createElement("option", {value: "LineString"}, "Street"), 
+	                React.createElement("option", {value: "Polygon"}, "Zone")
 	              ), 
 	              React.createElement("button", {type: "button", onClick: this.modifyFeature}, "Edit Feature"), 
 	              React.createElement("button", {type: "button", onClick: this.moveFeature}, "Move Feature"), 

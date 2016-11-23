@@ -5,6 +5,8 @@ var Dropzonedemo = require('./Dropzone.js');
 var Dropjsondemo = require('./Dropjson.js');
 var choose2del;
 var choose2rename;
+var select;
+var interactions;
 
 var OsmEditer = React.createClass({
 
@@ -29,6 +31,7 @@ var OsmEditer = React.createClass({
     },
 
     editMap(){
+      map.removeInteraction(select);
       var typeSelect = document.getElementById('type');
       interactions = new ol.interaction.Draw({
         source: sSource,
@@ -92,19 +95,21 @@ var OsmEditer = React.createClass({
       map.un('click', choose2del);
       map.un('click', choose2rename);
       map.removeInteraction(interactions);
+      map.removeInteraction(select);
       select = new ol.interaction.Select({
             layers: [slayer],
       });
       interactions = new ol.interaction.Modify({
         features: select.getFeatures(),
       });
-            map.addInteraction(select);
+      map.addInteraction(select);
       map.addInteraction(interactions);
     },
 
     moveFeature(){
       map.un('click', choose2del);
       map.removeInteraction(interactions);
+      map.removeInteraction(select);
       select = new ol.interaction.Select({
             layers: [slayer],
       });
@@ -118,6 +123,8 @@ var OsmEditer = React.createClass({
 
     delFeature(){
       map.un('click', choose2rename);
+      map.removeInteraction(select);
+      map.removeInteraction(interactions);
       var popup = new ol.Overlay.Popup();
       map.addOverlay(popup);
       select = new ol.interaction.Select({
@@ -159,6 +166,8 @@ var OsmEditer = React.createClass({
 
     renameFeature(){
       map.un('click', choose2del);
+      map.removeInteraction(select);
+      map.removeInteraction(interactions);
       var popup = new ol.Overlay.Popup();
       map.addOverlay(popup);
       select = new ol.interaction.Select({
@@ -217,15 +226,14 @@ var OsmEditer = React.createClass({
         <div className="col-sm-12">
           <Dropzonedemo />
           <Dropjsondemo />
-          <div id="map" class="map">
+          <div id="map">
             <button type="button" onClick={this.editMap}>Edit Map</button>  
             <form class="form-inline">
               <label>Add &nbsp;</label>
               <select id="type">
                 <option value="Pan">Pan</option>
-                <option value="Point">Point</option>
-                <option value="LineString">LineString</option>
-                <option value="Polygon">Polygon</option>
+                <option value="LineString">Street</option>
+                <option value="Polygon">Zone</option>
               </select>
               <button type="button" onClick={this.modifyFeature}>Edit Feature</button>
               <button type="button" onClick={this.moveFeature}>Move Feature</button>

@@ -38,7 +38,7 @@ var OsmEditer = React.createClass({
       this.modifyFeature();
       function addInteraction() {
         var value = typeSelect.value;
-        if (value !== 'None') {
+        if (value !== 'Pan') {
           map.removeInteraction(interactions);
           map.removeInteraction(select);
           interactions = new ol.interaction.Draw({
@@ -165,10 +165,8 @@ var OsmEditer = React.createClass({
         layers: [slayer],
       });
       map.addInteraction(select);
-      doRename = function(){
-        console.log("hello");
-        popup.hide();
-      };
+
+
       choose2rename = function (evt) {
         var feature = map.forEachFeatureAtPixel(evt.pixel,
         function (feature, slayer) {
@@ -183,10 +181,23 @@ var OsmEditer = React.createClass({
             var input = document.createElement("input");
             var name = SelectedFeature.getProperties().name;
             input.setAttribute("placeholder", name);
+            input.setAttribute("value", name);
+            input.id = "nameinput";
             el.appendChild(input);
 
+            doRename = function(){
+              console.log(document.getElementById("nameinput").value);
+              SelectedFeature.setProperties({
+                'name' : document.getElementById("nameinput").value
+              });
+              console.log("hello");
+              popup.hide();
+              select.getFeatures().remove(SelectedFeature);
+            };
+
             var btn = document.createElement("button");
-            btn.setAttribute("onClick", doRename);
+            btn.innerHTML = 'submit';
+            btn.onclick = doRename;
             el.appendChild(btn);
 
             popup.show(evt.coordinate, el);
@@ -196,7 +207,6 @@ var OsmEditer = React.createClass({
             return layer == slayer;
         });
       };
-
       map.on('click', choose2rename);
 
     },
@@ -212,7 +222,7 @@ var OsmEditer = React.createClass({
             <form class="form-inline">
               <label>Add &nbsp;</label>
               <select id="type">
-                <option value="None">None</option>
+                <option value="Pan">Pan</option>
                 <option value="Point">Point</option>
                 <option value="LineString">LineString</option>
                 <option value="Polygon">Polygon</option>

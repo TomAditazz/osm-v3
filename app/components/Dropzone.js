@@ -17,6 +17,9 @@ var DropzoneDemo = React.createClass({
 
 
       map = new ol.Map({
+        interactions: ol.interaction.defaults().extend([
+          new ol.interaction.DragRotateAndZoom()
+        ]),
         layers: [
           new ol.layer.Tile({
             source: new ol.source.OSM(),
@@ -28,13 +31,16 @@ var DropzoneDemo = React.createClass({
         ],
         target: 'map',
         view: new ol.View({
-          projection: 'EPSG:3857',
+          //projection: 'EPSG:3857',
           center: ol.proj.transform([lon, lat], 'EPSG:4326', 'EPSG:3857'),
           maxZoom: 19,
           zoom: 13
         })
       });
-                const scriptpop = document.createElement("script");
+      map.getView().fit(
+            vectorSource.getExtent(),(map.getSize()));
+
+      const scriptpop = document.createElement("script");
       scriptpop.src = "./ol3-popup.js";
       //script.async = true;
       document.body.appendChild(scriptpop);

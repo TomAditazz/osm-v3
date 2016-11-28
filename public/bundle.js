@@ -20740,6 +20740,7 @@
 
 	    moveFeature(){
 	      map.un('click', choose2del);
+	      map.un('click', choose2rename);
 	      map.removeInteraction(interactions);
 	      map.removeInteraction(select);
 	      select = new ol.interaction.Select({

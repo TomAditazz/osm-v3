@@ -20898,9 +20898,11 @@
 	      //console.log('Accepted files: ', acceptedFiles[0].preview);
 	      //console.log('Rejected files: ', rejectedFiles);
 	            //Initialise the vector layer using OpenLayers.Format.OSM
-	      var lat=50.88;
-	      var lon=-1.54;
+	      // var lat=50.88;
+	      // var lon=-1.54;
 	      var zoom=13;
+	      var lat=0;
+	      var lon=0;
 	      var vectorSource = new ol.source.Vector({
 	        url: acceptedFiles[0].preview,
 	        format: new ol.format.OSMXML()
@@ -20928,16 +20930,25 @@
 	          zoom: 13
 	        })
 	      });
-	      map.getView().fit(
-	            vectorSource.getExtent(),(map.getSize()));
 
+	      vectorSource.on('change', function(evt){
+	        var source = evt.target;
+	        if (source.getState() === 'ready') {
+	          var numFeatures = source.getFeatures().length; 
+	          console.log("Count after change: " + numFeatures);
+	          console.log(vectorSource.getExtent());
+	          map.getView().fit(
+	                vectorSource.getExtent(),(map.getSize())
+	          );    
+	        }
+	      });
+
+	      //console.log(slayer);
 	      const scriptpop = document.createElement("script");
 	      scriptpop.src = "./ol3-popup.js";
 	      //script.async = true;
 	      document.body.appendChild(scriptpop);
 	      console.log(scriptpop);
-	      
-
 	    },
 
 	    render: function () {
@@ -21430,7 +21441,6 @@
 	        source: sSource,
 	      });
 	      map.addLayer(slayer);
-	      //console.log(slayer);
 	    },
 
 	    render: function () {

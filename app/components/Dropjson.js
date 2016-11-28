@@ -20,7 +20,6 @@ var DropjsonDemo = React.createClass({
         source: sSource,
       });
       map.addLayer(slayer);
-      //console.log(slayer);
     },
 
     render: function () {

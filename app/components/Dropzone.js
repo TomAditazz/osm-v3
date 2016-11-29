@@ -6,7 +6,7 @@ var DropzoneDemo = React.createClass({
       //console.log('Accepted files: ', acceptedFiles);
       //console.log('Accepted files: ', acceptedFiles[0].preview);
       //console.log('Rejected files: ', rejectedFiles);
-            //Initialise the vector layer using OpenLayers.Format.OSM
+      //Initialise the vector layer using OpenLayers.Format.OSM
       // var lat=50.88;
       // var lon=-1.54;
       var zoom=13;
@@ -43,18 +43,14 @@ var DropzoneDemo = React.createClass({
         var source = evt.target;
         if (source.getState() === 'ready') {
           var numFeatures = source.getFeatures().length; 
-          console.log("Count after change: " + numFeatures);
-          console.log(vectorSource.getExtent());
           map.getView().fit(
                 vectorSource.getExtent(),(map.getSize())
           );    
         }
       });
 
-      //console.log(slayer);
       const scriptpop = document.createElement("script");
       scriptpop.src = "./ol3-popup.js";
-      //script.async = true;
       document.body.appendChild(scriptpop);
       console.log(scriptpop);
     },

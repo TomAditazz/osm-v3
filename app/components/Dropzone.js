@@ -1,5 +1,6 @@
 var React = require('react');
 var Dropzone = require('react-dropzone');
+var map;
 
 var DropzoneDemo = React.createClass({
     onDrop: function (acceptedFiles, rejectedFiles) {
@@ -15,15 +16,22 @@ var DropzoneDemo = React.createClass({
         format: new ol.format.OSMXML()
       });
 
+      osmLayer = new ol.layer.Tile({
+        source: new ol.source.OSM(),
+        visible: false
+      });
+      gmLayer = new olgm.layer.Google({
+        mapTypeId: google.maps.MapTypeId.SATELLITE,
+      });
 
       map = new ol.Map({
         interactions: ol.interaction.defaults().extend([
           new ol.interaction.DragRotateAndZoom()
         ]),
+        //interactions: olgm.interaction.defaults(),
         layers: [
-          new ol.layer.Tile({
-            source: new ol.source.OSM(),
-          }),
+          gmLayer,
+          osmLayer,
           new ol.layer.Vector({
             source: vectorSource,
             projection: 'EPSG:3857'
@@ -42,10 +50,12 @@ var DropzoneDemo = React.createClass({
       vectorSource.on('change', function(evt){
         var source = evt.target;
         if (source.getState() === 'ready') {
-          var numFeatures = source.getFeatures().length; 
+          //var numFeatures = source.getFeatures().length; 
           map.getView().fit(
                 vectorSource.getExtent(),(map.getSize())
-          );    
+          );   
+          var olGM = new olgm.OLGoogleMaps({map: map}); // map is the ol.Map instance
+          olGM.activate();
         }
       });
 
@@ -53,6 +63,7 @@ var DropzoneDemo = React.createClass({
       scriptpop.src = "./ol3-popup.js";
       document.body.appendChild(scriptpop);
       console.log(scriptpop);
+
     },
 
     render: function () {

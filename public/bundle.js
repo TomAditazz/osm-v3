@@ -20639,24 +20639,34 @@
 	var OsmEditer = React.createClass({displayName: "OsmEditer",
 
 	    componentWillMount() {
+	      // const script = document.createElement("script");
+	      // script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
+	      // //script.async = true;
+	      // document.body.appendChild(script);
+	      // console.log(script);
 
-	      const script = document.createElement("script");
-	      script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
+	      // const scriptgm = document.createElement("script");
+	      // scriptgm.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCtm3GMrDD5XYcHnvX3JCgL9n9u2UDcITw";
+	      // //script.async = true;
+	      // document.body.appendChild(scriptgm);
+	      // console.log(scriptgm);
+	      const scriptol3gm = document.createElement("script");
+	      scriptol3gm.src = "./ol3gm.js";
 	      //script.async = true;
-	      document.body.appendChild(script);
-	      console.log(script);
+	      document.body.appendChild(scriptol3gm);
+	      console.log(scriptol3gm);
 
 	    },
 	    componentDidMount() {
 
 	    },
-	    initialMap(){
+	    // initialMap(){
 
-	    },
+	    // },
 
-	    updateLayers(){
+	    // updateLayers(){
 
-	    },
+	    // },
 
 	    editMap(){
 	      map.removeInteraction(select);
@@ -20666,9 +20676,8 @@
 	      interactions = new ol.interaction.Draw({
 	        source: sSource,
 	      });
-	      //var draw; // global so we can remove it later
 
-	      this.modifyFeature();
+	      //this.modifyFeature();
 	      function addInteraction() {
 	        var value = typeSelect.value;
 	        if (value !== 'Pan') {
@@ -20797,6 +20806,10 @@
 	          }
 	      }, false);
 	    },
+	    toggle(){
+	      gmLayer.setVisible(!gmLayer.getVisible());
+	      osmLayer.setVisible(!osmLayer.getVisible());
+	    },
 
 	    renameFeature(){
 	      map.un('click', choose2del);
@@ -20874,7 +20887,8 @@
 	              React.createElement("button", {type: "button", onClick: this.moveFeature}, "Move Feature"), 
 	              React.createElement("button", {type: "button", onClick: this.delFeature}, "Delete Feature"), 
 	              React.createElement("button", {type: "button", onClick: this.renameFeature}, "Rename Feature"), 
-	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map")
+	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map"), 
+	              React.createElement("button", {type: "button", onClick: this.toggle}, "Toggle")
 	            )
 	          )
 	        )
@@ -20891,6 +20905,7 @@
 
 	var React = __webpack_require__(1);
 	var Dropzone = __webpack_require__(172);
+	var map;
 
 	var DropzoneDemo = React.createClass({displayName: "DropzoneDemo",
 	    onDrop: function (acceptedFiles, rejectedFiles) {
@@ -20906,15 +20921,22 @@
 	        format: new ol.format.OSMXML()
 	      });
 
+	      osmLayer = new ol.layer.Tile({
+	        source: new ol.source.OSM(),
+	        visible: false
+	      });
+	      gmLayer = new olgm.layer.Google({
+	        mapTypeId: google.maps.MapTypeId.SATELLITE,
+	      });
 
 	      map = new ol.Map({
 	        interactions: ol.interaction.defaults().extend([
 	          new ol.interaction.DragRotateAndZoom()
 	        ]),
+	        //interactions: olgm.interaction.defaults(),
 	        layers: [
-	          new ol.layer.Tile({
-	            source: new ol.source.OSM(),
-	          }),
+	          gmLayer,
+	          osmLayer,
 	          new ol.layer.Vector({
 	            source: vectorSource,
 	            projection: 'EPSG:3857'
@@ -20933,10 +20955,12 @@
 	      vectorSource.on('change', function(evt){
 	        var source = evt.target;
 	        if (source.getState() === 'ready') {
-	          var numFeatures = source.getFeatures().length; 
+	          //var numFeatures = source.getFeatures().length; 
 	          map.getView().fit(
 	                vectorSource.getExtent(),(map.getSize())
-	          );    
+	          );   
+	          var olGM = new olgm.OLGoogleMaps({map: map}); // map is the ol.Map instance
+	          olGM.activate();
 	        }
 	      });
 
@@ -20944,6 +20968,7 @@
 	      scriptpop.src = "./ol3-popup.js";
 	      document.body.appendChild(scriptpop);
 	      console.log(scriptpop);
+
 	    },
 
 	    render: function () {

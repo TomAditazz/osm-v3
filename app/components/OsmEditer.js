@@ -11,24 +11,34 @@ var interactions;
 var OsmEditer = React.createClass({
 
     componentWillMount() {
+      // const script = document.createElement("script");
+      // script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
+      // //script.async = true;
+      // document.body.appendChild(script);
+      // console.log(script);
 
-      const script = document.createElement("script");
-      script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
+      // const scriptgm = document.createElement("script");
+      // scriptgm.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCtm3GMrDD5XYcHnvX3JCgL9n9u2UDcITw";
+      // //script.async = true;
+      // document.body.appendChild(scriptgm);
+      // console.log(scriptgm);
+      const scriptol3gm = document.createElement("script");
+      scriptol3gm.src = "./ol3gm.js";
       //script.async = true;
-      document.body.appendChild(script);
-      console.log(script);
+      document.body.appendChild(scriptol3gm);
+      console.log(scriptol3gm);
 
     },
     componentDidMount() {
 
     },
-    initialMap(){
+    // initialMap(){
 
-    },
+    // },
 
-    updateLayers(){
+    // updateLayers(){
 
-    },
+    // },
 
     editMap(){
       map.removeInteraction(select);
@@ -38,9 +48,8 @@ var OsmEditer = React.createClass({
       interactions = new ol.interaction.Draw({
         source: sSource,
       });
-      //var draw; // global so we can remove it later
 
-      this.modifyFeature();
+      //this.modifyFeature();
       function addInteraction() {
         var value = typeSelect.value;
         if (value !== 'Pan') {
@@ -169,6 +178,10 @@ var OsmEditer = React.createClass({
           }
       }, false);
     },
+    toggle(){
+      gmLayer.setVisible(!gmLayer.getVisible());
+      osmLayer.setVisible(!osmLayer.getVisible());
+    },
 
     renameFeature(){
       map.un('click', choose2del);
@@ -247,6 +260,7 @@ var OsmEditer = React.createClass({
               <button type="button" onClick={this.delFeature}>Delete Feature</button> 
               <button type="button" onClick={this.renameFeature}>Rename Feature</button>        
               <button type="button" onClick={this.exportMap}>Output Map</button>
+              <button type="button" onClick={this.toggle}>Toggle</button>
             </form>
           </div>
         </div>

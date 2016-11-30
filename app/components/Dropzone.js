@@ -1,6 +1,6 @@
 var React = require('react');
 var Dropzone = require('react-dropzone');
-var map;
+
 
 var DropzoneDemo = React.createClass({
     onDrop: function (acceptedFiles, rejectedFiles) {
@@ -8,8 +8,8 @@ var DropzoneDemo = React.createClass({
       //console.log('Accepted files: ', acceptedFiles[0].preview);
       //console.log('Rejected files: ', rejectedFiles);
       //Initialise the vector layer using OpenLayers.Format.OSM
-      // var lat=50.88;
-      // var lon=-1.54;
+      // var lat=50.88048782209884;
+      // var lon=-1.54420135;
       var zoom=13;
       var vectorSource = new ol.source.Vector({
         url: acceptedFiles[0].preview,

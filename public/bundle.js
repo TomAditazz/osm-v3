@@ -20867,13 +20867,43 @@
 	      map.on('click', choose2rename);
 
 	    },
+	    getview(){
+	      //console.log(map.getView().getCenter());
+	      //var t = map.getView().getCenter();
+	      var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+	      
+	      // console.log(center);
+
+	      //working code
+	      //var center = map.getView().getCenter();
+	      document.getElementById("lon").value = center[0];
+	      document.getElementById("lat").value = center[1];
+	      document.getElementById("zoom").value = map.getView().getZoom();
+	      //end of working code
+	    },
+
+	    setview(){
+	      //var center = ol.proj.transform([lonn, latt], 'EPSG:4326', 'EPSG:3857');
+	      
+	      //working code
+	      var lonn = document.getElementById("lon").value;
+	      var latt = document.getElementById("lat").value;
+	      var zoom = document.getElementById("zoom").value;
+	      map.getView().setCenter([lonn, latt]);
+	      map.getView().setZoom(zoom);
+	      //end of working code
+	    },
 
 	  render: function(){
 	    return (
-	      React.createElement("div", {className: "col-sm-6"}, 
+	      React.createElement("div", null, 
 	        React.createElement("div", {className: "col-sm-12"}, 
-	          React.createElement(Dropzonedemo, null), 
-	          React.createElement(Dropjsondemo, null), 
+	          React.createElement("div", {className: "col-sm-6"}, 
+	            React.createElement(Dropzonedemo, null)
+	          ), 
+	          React.createElement("div", {className: "col-sm-6"}, 
+	            React.createElement(Dropjsondemo, null)
+	          ), 
 	          React.createElement("div", {id: "map"}, 
 	            React.createElement("button", {type: "button", onClick: this.editMap}, "Edit Map"), 
 	            React.createElement("form", {class: "form-inline"}, 
@@ -20889,6 +20919,13 @@
 	              React.createElement("button", {type: "button", onClick: this.renameFeature}, "Rename Feature"), 
 	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map"), 
 	              React.createElement("button", {type: "button", onClick: this.toggle}, "Toggle")
+	            ), 
+	            React.createElement("div", null, 
+	              React.createElement("input", {type: "text", placeholder: "lon", id: "lon"}), 
+	              React.createElement("input", {type: "text", placeholder: "lat", id: "lat"}), 
+	              React.createElement("input", {type: "text", placeholder: "Zoom", id: "zoom"}), 
+	              React.createElement("button", {type: "button", onClick: this.getview}, "Get View"), 
+	              React.createElement("button", {type: "button", onClick: this.setview}, "Set View")
 	            )
 	          )
 	        )
@@ -20905,7 +20942,7 @@
 
 	var React = __webpack_require__(1);
 	var Dropzone = __webpack_require__(172);
-	var map;
+
 
 	var DropzoneDemo = React.createClass({displayName: "DropzoneDemo",
 	    onDrop: function (acceptedFiles, rejectedFiles) {

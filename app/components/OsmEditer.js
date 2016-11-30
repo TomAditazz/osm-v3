@@ -239,13 +239,43 @@ var OsmEditer = React.createClass({
       map.on('click', choose2rename);
 
     },
+    getview(){
+      //console.log(map.getView().getCenter());
+      //var t = map.getView().getCenter();
+      //var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+      
+      // console.log(center);
+
+      //working code
+      var center = map.getView().getCenter();
+      document.getElementById("lon").value = center[0];
+      document.getElementById("lat").value = center[1];
+      document.getElementById("zoom").value = map.getView().getZoom();
+      //end of working code
+    },
+
+    setview(){
+      //var center = ol.proj.transform([lonn, latt], 'EPSG:4326', 'EPSG:3857');
+      
+      //working code
+      var lonn = document.getElementById("lon").value;
+      var latt = document.getElementById("lat").value;
+      var zoom = document.getElementById("zoom").value;
+      map.getView().setCenter([lonn, latt]);
+      map.getView().setZoom(zoom);
+      //end of working code
+    },
 
   render: function(){
     return (
-      <div className="col-sm-6">
+      <div>
         <div className="col-sm-12">
-          <Dropzonedemo />
-          <Dropjsondemo />
+          <div className="col-sm-6">
+            <Dropzonedemo />
+          </div>
+          <div className="col-sm-6">
+            <Dropjsondemo />
+          </div>  
           <div id="map">
             <button type="button" onClick={this.editMap}>Edit Map</button>  
             <form class="form-inline">
@@ -262,6 +292,13 @@ var OsmEditer = React.createClass({
               <button type="button" onClick={this.exportMap}>Output Map</button>
               <button type="button" onClick={this.toggle}>Toggle</button>
             </form>
+            <div>
+              <input type="text" placeholder="lon" id="lon"></input>
+              <input type="text" placeholder="lat" id="lat"></input>
+              <input type="text" placeholder="Zoom" id="zoom"></input>
+              <button type="button" onClick={this.getview}>Get View</button>
+              <button type="button" onClick={this.setview}>Set View</button>
+            </div>
           </div>
         </div>
       </div>

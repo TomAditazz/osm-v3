@@ -242,12 +242,12 @@ var OsmEditer = React.createClass({
     getview(){
       //console.log(map.getView().getCenter());
       //var t = map.getView().getCenter();
-      //var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+      //
       
       // console.log(center);
 
       //working code
-      var center = map.getView().getCenter();
+      var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
       document.getElementById("lon").value = center[0];
       document.getElementById("lat").value = center[1];
       document.getElementById("zoom").value = map.getView().getZoom();
@@ -255,13 +255,13 @@ var OsmEditer = React.createClass({
     },
 
     setview(){
-      //var center = ol.proj.transform([lonn, latt], 'EPSG:4326', 'EPSG:3857');
       
       //working code
-      var lonn = document.getElementById("lon").value;
-      var latt = document.getElementById("lat").value;
-      var zoom = document.getElementById("zoom").value;
-      map.getView().setCenter([lonn, latt]);
+      var lonn = parseFloat(document.getElementById("lon").value);
+      var latt = parseFloat(document.getElementById("lat").value);
+      var center = ol.proj.transform([lonn, latt], 'EPSG:4326', 'EPSG:3857');
+      var zoom = parseFloat(document.getElementById("zoom").value);
+      map.getView().setCenter(center);
       map.getView().setZoom(zoom);
       //end of working code
     },

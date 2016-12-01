@@ -20672,6 +20672,14 @@
 	      map.removeInteraction(select);
 	      map.un('click', choose2del);
 	      map.un('click', choose2rename);
+
+	      this.getview();
+	      map.on("moveend", function() {
+	        var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+	        document.getElementById("lon").value = center[0];
+	        document.getElementById("lat").value = center[1];
+	        document.getElementById("zoom").value = map.getView().getZoom();
+	      });
 	      var typeSelect = document.getElementById('type');
 	      interactions = new ol.interaction.Draw({
 	        source: sSource,

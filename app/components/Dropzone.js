@@ -3,7 +3,7 @@ var Dropzone = require('react-dropzone');
 
 
 var DropzoneDemo = React.createClass({
-    onDrop: function (acceptedFiles, rejectedFiles) {
+    onDropzone: function (acceptedFiles, rejectedFiles) {
       //console.log('Accepted files: ', acceptedFiles);
       //console.log('Accepted files: ', acceptedFiles[0].preview);
       //console.log('Rejected files: ', rejectedFiles);

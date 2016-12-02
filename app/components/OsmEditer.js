@@ -1,8 +1,12 @@
 var React = require('react');
 var todoStore = require('../stores/todoStore');
 var todoActions = require('../actions/todoActions');
+var Dropzone = require('react-dropzone');
+
 var Dropzonedemo = require('./Dropzone.js');
 var Dropjsondemo = require('./Dropjson.js');
+
+
 var choose2del;
 var choose2rename;
 var select;
@@ -283,7 +287,9 @@ var OsmEditer = React.createClass({
       <div>
         <div className="col-sm-12">
           <div className="col-sm-6">
-            <Dropzonedemo />
+            <Dropzone onDrop={this.onDropzone}>
+              <div>Try dropping some files here, or click to select files to upload.</div>
+            </Dropzone>
           </div>
           <div className="col-sm-6">
             <Dropjsondemo />

@@ -46,9 +46,7 @@
 
 	var React = __webpack_require__(1);
 	var ReactDom = __webpack_require__(158);
-	var ListContainer = __webpack_require__(159);
-	var OsmEditer = __webpack_require__(170);
-	var ShowOSM = __webpack_require__(174);
+	var OsmEditer = __webpack_require__(159);
 
 	var App = React.createClass({displayName: "App",
 	  render: function(){
@@ -19766,137 +19764,343 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
-	var AddItem = __webpack_require__(160);
-	var List = __webpack_require__(161);
-	var todoStore = __webpack_require__(162);
-	var todoActions = __webpack_require__(169);
+	var todoStore = __webpack_require__(160);
+	var todoActions = __webpack_require__(167);
+	var Dropzonedemo = __webpack_require__(168);
+	var Dropjsondemo = __webpack_require__(170);
+	var choose2del;
+	var choose2rename;
+	var select;
+	var interactions;
 
-	var ListContainer = React.createClass({displayName: "ListContainer",
-	  getInitialState: function(){
-	    return {
-	      list: todoStore.getList()
-	    }
-	  },
-	  componentDidMount: function(){
-	    todoStore.addChangeListener(this._onChange);
-	  },
-	  componentWillUnmount: function(){
-	    todoStore.removeChangeListener(this._onChange);
-	  },
-	  handleAddItem: function(newItem){
-	    todoActions.addItem(newItem);
-	  },
-	  handleRemoveItem: function(index){
-	    todoActions.removeItem(index);
-	  },
-	  _onChange: function(){
-	    this.setState({
-	      list: todoStore.getList()
-	    })
-	  },
+	var OsmEditer = React.createClass({displayName: "OsmEditer",
+
+	    componentWillMount() {
+	      // const script = document.createElement("script");
+	      // script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
+	      // //script.async = true;
+	      // document.body.appendChild(script);
+	      // console.log(script);
+
+	      // const scriptgm = document.createElement("script");
+	      // scriptgm.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCtm3GMrDD5XYcHnvX3JCgL9n9u2UDcITw";
+	      // //script.async = true;
+	      // document.body.appendChild(scriptgm);
+	      // console.log(scriptgm);
+
+	      // const scriptpop = document.createElement("script");
+	      // scriptpop.src = "./ol3-popup.js";
+	      // document.body.appendChild(scriptpop);
+	      // console.log(scriptpop);
+
+	      // const scriptpop = document.createElement("script");
+	      // scriptpop.src = "./ol3-popup.js";
+	      // document.body.appendChild(scriptpop);
+	      // console.log(scriptpop);
+
+	    },
+	    componentDidMount() {
+
+	    },
+	    // initialMap(){
+
+	    // },
+
+	    // updateLayers(){
+
+	    // },
+
+	    editMap(){
+	      
+	      const scriptol3gm = document.createElement("script");
+	      scriptol3gm.src = "./ol3gm.js";
+	      //script.async = true;
+	      document.body.appendChild(scriptol3gm);
+	      console.log(scriptol3gm);
+
+	      map.removeInteraction(select);
+	      map.un('click', choose2del);
+	      map.un('click', choose2rename);
+
+	      this.getview();
+	      map.on("moveend", function() {
+	        var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+	        document.getElementById("lon").value = center[0];
+	        document.getElementById("lat").value = center[1];
+	        document.getElementById("zoom").value = map.getView().getZoom();
+	      });
+	      var typeSelect = document.getElementById('type');
+	      interactions = new ol.interaction.Draw({
+	        source: sSource,
+	      });
+
+	      //this.modifyFeature();
+	      function addInteraction() {
+	        var value = typeSelect.value;
+	        if (value !== 'Pan') {
+	          map.removeInteraction(interactions);
+	          map.removeInteraction(select);
+	          interactions = new ol.interaction.Draw({
+	            source: sSource,
+	            type: /** @type {ol.geom.GeometryType} */ (typeSelect.value)
+	          });
+	          interactions.on('drawend', function (e) {
+	            var id = Math.floor((1 + Math.random()) * 0x10000).toString(16);
+	            var type = (typeSelect.value == 'Polygon') ? 'Zone' : 'Road';
+	            e.feature.featureID = id;
+	            e.feature.setProperties({
+	                'id': id,
+	                'name': 'new ' + type,
+	                'type': type
+	            })
+	            console.log(e.feature.getProperties());
+	            document.getElementById("type").selectedIndex = 0;
+	            map.removeInteraction(interactions);
+	          });
+	          map.addInteraction(interactions);
+	        }else{
+	          map.removeInteraction(interactions);
+	          interactions = new ol.interaction.Select({
+	                layers: [slayer],
+	          });
+	          map.addInteraction(interactions);        
+	        }
+	      }
+
+	      /**
+	       * Handle change event.
+	       */
+	      typeSelect.onchange = function() {
+	        map.removeInteraction(interactions);
+	        addInteraction();
+	      };
+
+	      addInteraction();
+	    },
+
+	    exportMap(){
+	      var allFeatures = slayer.getSource().getFeatures();
+	      //console.log(allFeatures);
+	      var format = new ol.format.GeoJSON();
+	      var routeFeatures = format.writeFeatures(allFeatures,{
+	        dataProjection: 'EPSG:4326',
+	        featureProjection: 'EPSG:3857'
+	      });
+	      console.log(routeFeatures);
+	    },
+
+	    modifyFeature(){
+	      map.un('click', choose2del);
+	      map.un('click', choose2rename);
+	      map.removeInteraction(interactions);
+	      map.removeInteraction(select);
+	      select = new ol.interaction.Select({
+	            layers: [slayer],
+	      });
+	      interactions = new ol.interaction.Modify({
+	        features: select.getFeatures(),
+	      });
+	      map.addInteraction(select);
+	      map.addInteraction(interactions);
+	    },
+
+	    moveFeature(){
+	      map.un('click', choose2del);
+	      map.un('click', choose2rename);
+	      map.removeInteraction(interactions);
+	      map.removeInteraction(select);
+	      select = new ol.interaction.Select({
+	            layers: [slayer],
+	      });
+	      interactions = new ol.interaction.Translate({
+	        features: select.getFeatures(),
+	      });
+	      console.log(interactions);
+	      map.addInteraction(select);
+	      map.addInteraction(interactions);
+	    },
+
+	    delFeature(){
+	      map.un('click', choose2rename);
+	      map.removeInteraction(select);
+	      map.removeInteraction(interactions);
+	      var popup = new ol.Overlay.Popup();
+	      map.addOverlay(popup);
+	      select = new ol.interaction.Select({
+	        layers: [slayer],
+	      });
+	      map.addInteraction(select);
+	      choose2del = function (evt) {
+	        var feature = map.forEachFeatureAtPixel(evt.pixel,
+	        function (feature, slayer) {
+	            SelectedFeature = feature;
+	            var el = document.createElement("div");
+	            var title = document.createElement("h3");
+	            title.innerHTML = 'Delete ' + feature.getProperties().name + ' ?';
+	            el.appendChild(title);
+	            var content = document.createElement("p");
+	            content.innerHTML = '<a href="#" data-action="yes">Yes</a>, <a href="#" data-action="no">No</a>';
+	            el.appendChild(content);
+	            popup.show(evt.coordinate, el);
+	            console.log(feature.featureID);
+	        }, null, function(layer){
+	            return layer == slayer;
+	        });
+	      };
+	      map.on('click', choose2del);
+	      popup.getElement().addEventListener('click', function(e) {
+	          var action = e.target.getAttribute('data-action');
+	          if (action) {
+	              //alert('You choose: ' + action);
+	              popup.hide();
+	              //map.removeOverlay(popup);
+	              if (action === 'yes') {
+	                console.log(SelectedFeature);
+	                select.getFeatures().remove(SelectedFeature);
+	                slayer.getSource().removeFeature(SelectedFeature);
+	              }
+	              e.preventDefault();
+	          }
+	      }, false);
+	    },
+	    toggle(){
+	      gmLayer.setVisible(!gmLayer.getVisible());
+	      osmLayer.setVisible(!osmLayer.getVisible());
+	    },
+
+	    renameFeature(){
+	      map.un('click', choose2del);
+	      map.removeInteraction(select);
+	      map.removeInteraction(interactions);
+	      var popup = new ol.Overlay.Popup();
+	      map.addOverlay(popup);
+	      select = new ol.interaction.Select({
+	        layers: [slayer],
+	      });
+	      map.addInteraction(select);
+
+
+	      choose2rename = function (evt) {
+	        var feature = map.forEachFeatureAtPixel(evt.pixel,
+	        function (feature, slayer) {
+	            SelectedFeature = feature;
+
+	            var el = document.createElement("div");
+
+	            var title = document.createElement("h3");
+	            title.innerHTML = 'Rename: ';
+	            el.appendChild(title);
+
+	            var input = document.createElement("input");
+	            var name = SelectedFeature.getProperties().name;
+	            input.setAttribute("placeholder", name);
+	            input.setAttribute("value", name);
+	            input.id = "nameinput";
+	            el.appendChild(input);
+
+	            doRename = function(){
+	              console.log(document.getElementById("nameinput").value);
+	              SelectedFeature.setProperties({
+	                'name' : document.getElementById("nameinput").value
+	              });
+	              console.log("hello");
+	              popup.hide();
+	              //map.removeOverlay(popup);
+	              select.getFeatures().remove(SelectedFeature);
+	            };
+
+	            var btn = document.createElement("button");
+	            btn.innerHTML = 'submit';
+	            btn.onclick = doRename;
+	            el.appendChild(btn);
+
+	            popup.show(evt.coordinate, el);
+
+	            console.log(feature.featureID);
+	        }, null, function(layer){
+	            return layer == slayer;
+	        });
+	      };
+	      map.on('click', choose2rename);
+
+	    },
+	    getview(){
+	      //console.log(map.getView().getCenter());
+	      //var t = map.getView().getCenter();
+	      //
+	      
+	      // console.log(center);
+
+	      //working code
+	      var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+	      document.getElementById("lon").value = center[0];
+	      document.getElementById("lat").value = center[1];
+	      document.getElementById("zoom").value = map.getView().getZoom();
+	      //end of working code
+	    },
+
+	    setview(){
+	      
+	      //working code
+	      var lonn = parseFloat(document.getElementById("lon").value);
+	      var latt = parseFloat(document.getElementById("lat").value);
+	      var center = ol.proj.transform([lonn, latt], 'EPSG:4326', 'EPSG:3857');
+	      var zoom = parseFloat(document.getElementById("zoom").value);
+	      map.getView().setCenter(center);
+	      map.getView().setZoom(zoom);
+	      //end of working code
+	    },
+
 	  render: function(){
 	    return (
-	      React.createElement("div", {className: "col-sm-6 col-md-offset-3"}, 
+	      React.createElement("div", null, 
 	        React.createElement("div", {className: "col-sm-12"}, 
-	          React.createElement("h3", {className: "text-center"}, " Todo List "), 
-	          React.createElement(AddItem, {add: this.handleAddItem}), 
-	          React.createElement(List, {items: this.state.list, remove: this.handleRemoveItem})
+	          React.createElement("div", {className: "col-sm-6"}, 
+	            React.createElement(Dropzonedemo, null)
+	          ), 
+	          React.createElement("div", {className: "col-sm-6"}, 
+	            React.createElement(Dropjsondemo, null)
+	          ), 
+	          React.createElement("div", {id: "map"}, 
+	            React.createElement("button", {type: "button", onClick: this.editMap}, "Edit Map"), 
+	            React.createElement("form", {class: "form-inline"}, 
+	              React.createElement("label", null, "Add  "), 
+	              React.createElement("select", {id: "type"}, 
+	                React.createElement("option", {value: "Pan"}, "Pan"), 
+	                React.createElement("option", {value: "LineString"}, "Road"), 
+	                React.createElement("option", {value: "Polygon"}, "Zone")
+	              ), 
+	              React.createElement("button", {type: "button", onClick: this.modifyFeature}, "Edit Feature"), 
+	              React.createElement("button", {type: "button", onClick: this.moveFeature}, "Move Feature"), 
+	              React.createElement("button", {type: "button", onClick: this.delFeature}, "Delete Feature"), 
+	              React.createElement("button", {type: "button", onClick: this.renameFeature}, "Rename Feature"), 
+	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map"), 
+	              React.createElement("button", {type: "button", onClick: this.toggle}, "Toggle")
+	            ), 
+	            React.createElement("div", null, 
+	              React.createElement("input", {type: "text", placeholder: "lon", id: "lon"}), 
+	              React.createElement("input", {type: "text", placeholder: "lat", id: "lat"}), 
+	              React.createElement("input", {type: "text", placeholder: "Zoom", id: "zoom"}), 
+	              React.createElement("button", {type: "button", onClick: this.getview}, "Get View"), 
+	              React.createElement("button", {type: "button", onClick: this.setview}, "Set View")
+	            )
+	          )
 	        )
 	      )
 	    )
 	  }
 	});
 
-	module.exports = ListContainer;
+	module.exports = OsmEditer;
 
 /***/ },
 /* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(1);
-
-	var AddItem = React.createClass({displayName: "AddItem",
-	  handleSubmit: function(e){
-	    if(e.keyCode === 13){
-	      var newItem = this.refs.newItem.getDOMNode().value;
-	      this.refs.newItem.getDOMNode().value = '';
-	      this.props.add(newItem);
-	    }
-	  },
-	  render: function(){
-	    return (
-	      React.createElement("div", null, 
-	        React.createElement("input", {type: "text", ref: "newItem", className: "form-control", placeholder: "New Item", onKeyDown: this.handleSubmit})
-	      )
-	    )
-	  }
-	});
-
-	module.exports = AddItem;
-
-/***/ },
-/* 161 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-
-	var List = React.createClass({displayName: "List",
-	  render: function(){
-	    var styles = {
-	      uList: {
-	        paddingLeft: 0,
-	        listStyleType: "none"
-	      },
-	      listGroup: {
-	        margin: '5px 0',
-	        borderRadius: 5
-	      },
-	      removeItem: {
-	        fontSize: 20,
-	        float: "left",
-	        position: "absolute",
-	        top: 12,
-	        left: 6,
-	        cursor: "pointer",
-	        color: "rgb(222, 79, 79)"
-	      },
-	      todoItem: {
-	        paddingLeft: 20,
-	        fontSize: 17
-	      }
-	    };
-	    var listItems = this.props.items.map(function(item, index){
-	      return (
-	        React.createElement("li", {key: index, className: "list-group-item", style: styles.listGroup}, 
-	          React.createElement("span", {
-	            className: "glyphicon glyphicon-remove", 
-	            style: styles.removeItem, 
-	            onClick: this.props.remove.bind(null, index)}
-	          ), 
-	          React.createElement("span", {style: styles.todoItem}, 
-	            item
-	          )
-	        )
-	      )
-	    }.bind(this));
-	    return (
-	      React.createElement("ul", {style: styles.uList}, 
-	        listItems
-	      )
-	    )
-	  }
-	});
-
-	module.exports = List;
-
-/***/ },
-/* 162 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var AppDispatcher = __webpack_require__(163);
-	var appConstants = __webpack_require__(167);
+	var AppDispatcher = __webpack_require__(161);
+	var appConstants = __webpack_require__(165);
 	var objectAssign = __webpack_require__(39);
-	var EventEmitter = __webpack_require__(168).EventEmitter;
+	var EventEmitter = __webpack_require__(166).EventEmitter;
 
 	var CHANGE_EVENT = 'change';
 
@@ -19953,10 +20157,10 @@
 
 
 /***/ },
-/* 163 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Dispatcher = __webpack_require__(164).Dispatcher;
+	var Dispatcher = __webpack_require__(162).Dispatcher;
 	var AppDispatcher = new Dispatcher();
 
 	AppDispatcher.handleAction = function(action){
@@ -19969,7 +20173,7 @@
 	module.exports = AppDispatcher;
 
 /***/ },
-/* 164 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -19981,11 +20185,11 @@
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 */
 
-	module.exports.Dispatcher = __webpack_require__(165);
+	module.exports.Dispatcher = __webpack_require__(163);
 
 
 /***/ },
-/* 165 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20007,7 +20211,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var invariant = __webpack_require__(166);
+	var invariant = __webpack_require__(164);
 
 	var _prefix = 'ID_';
 
@@ -20222,7 +20426,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 166 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -20277,7 +20481,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ },
-/* 167 */
+/* 165 */
 /***/ function(module, exports) {
 
 	var appConstants = {
@@ -20290,7 +20494,7 @@
 	module.exports = appConstants;
 
 /***/ },
-/* 168 */
+/* 166 */
 /***/ function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -20598,11 +20802,11 @@
 
 
 /***/ },
-/* 169 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(163);
-	var appConstants = __webpack_require__(167);
+	var AppDispatcher = __webpack_require__(161);
+	var appConstants = __webpack_require__(165);
 
 	var todoActions = {
 	  addItem: function(item){
@@ -20623,333 +20827,11 @@
 
 
 /***/ },
-/* 170 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
-	var todoStore = __webpack_require__(162);
-	var todoActions = __webpack_require__(169);
-	var Dropzonedemo = __webpack_require__(171);
-	var Dropjsondemo = __webpack_require__(173);
-	var choose2del;
-	var choose2rename;
-	var select;
-	var interactions;
-
-	var OsmEditer = React.createClass({displayName: "OsmEditer",
-
-	    componentWillMount() {
-	      // const script = document.createElement("script");
-	      // script.src = "https://openlayers.org/en/v3.19.1/build/ol.js";
-	      // //script.async = true;
-	      // document.body.appendChild(script);
-	      // console.log(script);
-
-	      // const scriptgm = document.createElement("script");
-	      // scriptgm.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCtm3GMrDD5XYcHnvX3JCgL9n9u2UDcITw";
-	      // //script.async = true;
-	      // document.body.appendChild(scriptgm);
-	      // console.log(scriptgm);
-	      const scriptol3gm = document.createElement("script");
-	      scriptol3gm.src = "./ol3gm.js";
-	      //script.async = true;
-	      document.body.appendChild(scriptol3gm);
-	      console.log(scriptol3gm);
-
-	    },
-	    componentDidMount() {
-
-	    },
-	    // initialMap(){
-
-	    // },
-
-	    // updateLayers(){
-
-	    // },
-
-	    editMap(){
-	      map.removeInteraction(select);
-	      map.un('click', choose2del);
-	      map.un('click', choose2rename);
-
-	      this.getview();
-	      map.on("moveend", function() {
-	        var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
-	        document.getElementById("lon").value = center[0];
-	        document.getElementById("lat").value = center[1];
-	        document.getElementById("zoom").value = map.getView().getZoom();
-	      });
-	      var typeSelect = document.getElementById('type');
-	      interactions = new ol.interaction.Draw({
-	        source: sSource,
-	      });
-
-	      //this.modifyFeature();
-	      function addInteraction() {
-	        var value = typeSelect.value;
-	        if (value !== 'Pan') {
-	          map.removeInteraction(interactions);
-	          map.removeInteraction(select);
-	          interactions = new ol.interaction.Draw({
-	            source: sSource,
-	            type: /** @type {ol.geom.GeometryType} */ (typeSelect.value)
-	          });
-	          interactions.on('drawend', function (e) {
-	            var id = Math.floor((1 + Math.random()) * 0x10000).toString(16);
-	            var type = (typeSelect.value == 'Polygon') ? 'Zone' : 'Road';
-	            e.feature.featureID = id;
-	            e.feature.setProperties({
-	                'id': id,
-	                'name': 'new ' + type,
-	                'type': type
-	            })
-	            console.log(e.feature.getProperties());
-	            document.getElementById("type").selectedIndex = 0;
-	            map.removeInteraction(interactions);
-	          });
-	          map.addInteraction(interactions);
-	        }else{
-	          map.removeInteraction(interactions);
-	          interactions = new ol.interaction.Select({
-	                layers: [slayer],
-	          });
-	          map.addInteraction(interactions);        
-	        }
-	      }
-
-	      /**
-	       * Handle change event.
-	       */
-	      typeSelect.onchange = function() {
-	        map.removeInteraction(interactions);
-	        addInteraction();
-	      };
-
-	      addInteraction();
-	    },
-
-	    exportMap(){
-	      var allFeatures = slayer.getSource().getFeatures();
-	      //console.log(allFeatures);
-	      var format = new ol.format.GeoJSON();
-	      var routeFeatures = format.writeFeatures(allFeatures,{
-	        dataProjection: 'EPSG:4326',
-	        featureProjection: 'EPSG:3857'
-	      });
-	      console.log(routeFeatures);
-	    },
-
-	    modifyFeature(){
-	      map.un('click', choose2del);
-	      map.un('click', choose2rename);
-	      map.removeInteraction(interactions);
-	      map.removeInteraction(select);
-	      select = new ol.interaction.Select({
-	            layers: [slayer],
-	      });
-	      interactions = new ol.interaction.Modify({
-	        features: select.getFeatures(),
-	      });
-	      map.addInteraction(select);
-	      map.addInteraction(interactions);
-	    },
-
-	    moveFeature(){
-	      map.un('click', choose2del);
-	      map.un('click', choose2rename);
-	      map.removeInteraction(interactions);
-	      map.removeInteraction(select);
-	      select = new ol.interaction.Select({
-	            layers: [slayer],
-	      });
-	      interactions = new ol.interaction.Translate({
-	        features: select.getFeatures(),
-	      });
-	      console.log(interactions);
-	      map.addInteraction(select);
-	      map.addInteraction(interactions);
-	    },
-
-	    delFeature(){
-	      map.un('click', choose2rename);
-	      map.removeInteraction(select);
-	      map.removeInteraction(interactions);
-	      var popup = new ol.Overlay.Popup();
-	      map.addOverlay(popup);
-	      select = new ol.interaction.Select({
-	        layers: [slayer],
-	      });
-	      map.addInteraction(select);
-	      choose2del = function (evt) {
-	        var feature = map.forEachFeatureAtPixel(evt.pixel,
-	        function (feature, slayer) {
-	            SelectedFeature = feature;
-	            var el = document.createElement("div");
-	            var title = document.createElement("h3");
-	            title.innerHTML = 'Delete ' + feature.getProperties().name + ' ?';
-	            el.appendChild(title);
-	            var content = document.createElement("p");
-	            content.innerHTML = '<a href="#" data-action="yes">Yes</a>, <a href="#" data-action="no">No</a>';
-	            el.appendChild(content);
-	            popup.show(evt.coordinate, el);
-	            console.log(feature.featureID);
-	        }, null, function(layer){
-	            return layer == slayer;
-	        });
-	      };
-	      map.on('click', choose2del);
-	      popup.getElement().addEventListener('click', function(e) {
-	          var action = e.target.getAttribute('data-action');
-	          if (action) {
-	              //alert('You choose: ' + action);
-	              popup.hide();
-	              //map.removeOverlay(popup);
-	              if (action === 'yes') {
-	                console.log(SelectedFeature);
-	                select.getFeatures().remove(SelectedFeature);
-	                slayer.getSource().removeFeature(SelectedFeature);
-	              }
-	              e.preventDefault();
-	          }
-	      }, false);
-	    },
-	    toggle(){
-	      gmLayer.setVisible(!gmLayer.getVisible());
-	      osmLayer.setVisible(!osmLayer.getVisible());
-	    },
-
-	    renameFeature(){
-	      map.un('click', choose2del);
-	      map.removeInteraction(select);
-	      map.removeInteraction(interactions);
-	      var popup = new ol.Overlay.Popup();
-	      map.addOverlay(popup);
-	      select = new ol.interaction.Select({
-	        layers: [slayer],
-	      });
-	      map.addInteraction(select);
-
-
-	      choose2rename = function (evt) {
-	        var feature = map.forEachFeatureAtPixel(evt.pixel,
-	        function (feature, slayer) {
-	            SelectedFeature = feature;
-
-	            var el = document.createElement("div");
-
-	            var title = document.createElement("h3");
-	            title.innerHTML = 'Rename: ';
-	            el.appendChild(title);
-
-	            var input = document.createElement("input");
-	            var name = SelectedFeature.getProperties().name;
-	            input.setAttribute("placeholder", name);
-	            input.setAttribute("value", name);
-	            input.id = "nameinput";
-	            el.appendChild(input);
-
-	            doRename = function(){
-	              console.log(document.getElementById("nameinput").value);
-	              SelectedFeature.setProperties({
-	                'name' : document.getElementById("nameinput").value
-	              });
-	              console.log("hello");
-	              popup.hide();
-	              //map.removeOverlay(popup);
-	              select.getFeatures().remove(SelectedFeature);
-	            };
-
-	            var btn = document.createElement("button");
-	            btn.innerHTML = 'submit';
-	            btn.onclick = doRename;
-	            el.appendChild(btn);
-
-	            popup.show(evt.coordinate, el);
-
-	            console.log(feature.featureID);
-	        }, null, function(layer){
-	            return layer == slayer;
-	        });
-	      };
-	      map.on('click', choose2rename);
-
-	    },
-	    getview(){
-	      //console.log(map.getView().getCenter());
-	      //var t = map.getView().getCenter();
-	      //
-	      
-	      // console.log(center);
-
-	      //working code
-	      var center = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
-	      document.getElementById("lon").value = center[0];
-	      document.getElementById("lat").value = center[1];
-	      document.getElementById("zoom").value = map.getView().getZoom();
-	      //end of working code
-	    },
-
-	    setview(){
-	      
-	      //working code
-	      var lonn = parseFloat(document.getElementById("lon").value);
-	      var latt = parseFloat(document.getElementById("lat").value);
-	      var center = ol.proj.transform([lonn, latt], 'EPSG:4326', 'EPSG:3857');
-	      var zoom = parseFloat(document.getElementById("zoom").value);
-	      map.getView().setCenter(center);
-	      map.getView().setZoom(zoom);
-	      //end of working code
-	    },
-
-	  render: function(){
-	    return (
-	      React.createElement("div", null, 
-	        React.createElement("div", {className: "col-sm-12"}, 
-	          React.createElement("div", {className: "col-sm-6"}, 
-	            React.createElement(Dropzonedemo, null)
-	          ), 
-	          React.createElement("div", {className: "col-sm-6"}, 
-	            React.createElement(Dropjsondemo, null)
-	          ), 
-	          React.createElement("div", {id: "map"}, 
-	            React.createElement("button", {type: "button", onClick: this.editMap}, "Edit Map"), 
-	            React.createElement("form", {class: "form-inline"}, 
-	              React.createElement("label", null, "Add  "), 
-	              React.createElement("select", {id: "type"}, 
-	                React.createElement("option", {value: "Pan"}, "Pan"), 
-	                React.createElement("option", {value: "LineString"}, "Road"), 
-	                React.createElement("option", {value: "Polygon"}, "Zone")
-	              ), 
-	              React.createElement("button", {type: "button", onClick: this.modifyFeature}, "Edit Feature"), 
-	              React.createElement("button", {type: "button", onClick: this.moveFeature}, "Move Feature"), 
-	              React.createElement("button", {type: "button", onClick: this.delFeature}, "Delete Feature"), 
-	              React.createElement("button", {type: "button", onClick: this.renameFeature}, "Rename Feature"), 
-	              React.createElement("button", {type: "button", onClick: this.exportMap}, "Output Map"), 
-	              React.createElement("button", {type: "button", onClick: this.toggle}, "Toggle")
-	            ), 
-	            React.createElement("div", null, 
-	              React.createElement("input", {type: "text", placeholder: "lon", id: "lon"}), 
-	              React.createElement("input", {type: "text", placeholder: "lat", id: "lat"}), 
-	              React.createElement("input", {type: "text", placeholder: "Zoom", id: "zoom"}), 
-	              React.createElement("button", {type: "button", onClick: this.getview}, "Get View"), 
-	              React.createElement("button", {type: "button", onClick: this.setview}, "Set View")
-	            )
-	          )
-	        )
-	      )
-	    )
-	  }
-	});
-
-	module.exports = OsmEditer;
-
-/***/ },
-/* 171 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var Dropzone = __webpack_require__(172);
+	var Dropzone = __webpack_require__(169);
 
 
 	var DropzoneDemo = React.createClass({displayName: "DropzoneDemo",
@@ -20966,15 +20848,15 @@
 	        format: new ol.format.OSMXML()
 	      });
 
-	      osmLayer = new ol.layer.Tile({
+	      const osmLayer = new ol.layer.Tile({
 	        source: new ol.source.OSM(),
 	        visible: false
 	      });
-	      gmLayer = new olgm.layer.Google({
+	      const gmLayer = new olgm.layer.Google({
 	        mapTypeId: google.maps.MapTypeId.SATELLITE,
 	      });
 
-	      map = new ol.Map({
+	       const map = new ol.Map({
 	        interactions: ol.interaction.defaults().extend([
 	          new ol.interaction.DragRotateAndZoom()
 	        ]),
@@ -21009,10 +20891,10 @@
 	        }
 	      });
 
-	      const scriptpop = document.createElement("script");
-	      scriptpop.src = "./ol3-popup.js";
-	      document.body.appendChild(scriptpop);
-	      console.log(scriptpop);
+	      // const scriptpop = document.createElement("script");
+	      // scriptpop.src = "./ol3-popup.js";
+	      // document.body.appendChild(scriptpop);
+	      // console.log(scriptpop);
 
 	    },
 
@@ -21030,7 +20912,7 @@
 	module.exports = DropzoneDemo;
 
 /***/ },
-/* 172 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function webpackUniversalModuleDefinition(root, factory) {
@@ -21481,11 +21363,11 @@
 	//# sourceMappingURL=index.js.map
 
 /***/ },
-/* 173 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);
-	var Dropzone = __webpack_require__(172);
+	var Dropzone = __webpack_require__(169);
 
 	var DropjsonDemo = React.createClass({displayName: "DropjsonDemo",
 	    onDrop: function (acceptedFiles, rejectedFiles) {
@@ -21521,82 +21403,6 @@
 	});
 
 	module.exports = DropjsonDemo;
-
-/***/ },
-/* 174 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var todoStore = __webpack_require__(162);
-	var todoActions = __webpack_require__(169);
-
-	var ShowOSM = React.createClass({displayName: "ShowOSM",
-	  
-	    componentWillMount() {
-	      const script = document.createElement("script");
-
-	        script.src = "/OSMBuildings.js";
-	        //script.async = true;
-
-	        document.body.appendChild(script);
-	        console.log(script);
-	    },
-	    componentDidMount() {
-
-	    },
-
-	    initalMap(){ 
-	      osmb = new OSMBuildings({
-	        //baseURL: './OSMBuildings',
-	        zoom: 16,
-	        minZoom: 16,
-	        maxZoom: 19,
-	        position: { latitude:52.52000, longitude:13.41000 },
-	        state: true, // stores map position/rotation in url
-	        effects: ['shadows'],
-	        attribution: '© 3D <a href="https://osmbuildings.org/copyright/">OSM Buildings</a>'
-	      });
-	      osmb.appendTo('map');
-
-	      osmb.addMapTiles(
-	        'https://{s}.tiles.mapbox.com/v3/osmbuildings.kbpalbpk/{z}/{x}/{y}.png',
-	        {
-	          attribution: '© Data <a href="https://openstreetmap.org/copyright/">OpenStreetMap</a> · © Map <a href="https://mapbox.com/">Mapbox</a>'
-	        }
-	      );
-	    },
-
-	    addBuilding(){
-	      osmb.addGeoJSONTiles('https://{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json');
-	      osmb.on('pointermove', function(e) {
-	        osmb.getTarget(e.detail.x, e.detail.y, function(id) {
-	          if (id) {
-	            osmb.highlight(id, '#f08000');
-	          } else {
-	            osmb.highlight(null);
-	          }
-	        });
-	      });
-
-	    },
-	    interAction(){
-
-	    },
-	  render: function(){
-	    return (
-	      React.createElement("div", {className: "col-sm-6"}, 
-	        React.createElement("div", {className: "col-sm-12"}, 
-	          React.createElement("div", {id: "map", onmouseover: this.interAction}, 
-	            React.createElement("button", {type: "button", onClick: this.initalMap}, "Inital Map"), 
-	            React.createElement("button", {type: "button", onClick: this.addBuilding}, "Add Building")
-	          )
-	        )
-	      )
-	    )
-	  }
-	});
-
-	module.exports = ShowOSM;
 
 /***/ }
 /******/ ]);

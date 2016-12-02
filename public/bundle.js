@@ -19787,16 +19787,11 @@
 	      // //script.async = true;
 	      // document.body.appendChild(scriptgm);
 	      // console.log(scriptgm);
-
-	      // const scriptpop = document.createElement("script");
-	      // scriptpop.src = "./ol3-popup.js";
-	      // document.body.appendChild(scriptpop);
-	      // console.log(scriptpop);
-
-	      // const scriptpop = document.createElement("script");
-	      // scriptpop.src = "./ol3-popup.js";
-	      // document.body.appendChild(scriptpop);
-	      // console.log(scriptpop);
+	      const scriptol3gm = document.createElement("script");
+	      scriptol3gm.src = "./ol3gm.js";
+	      //script.async = true;
+	      document.body.appendChild(scriptol3gm);
+	      console.log(scriptol3gm);
 
 	    },
 	    componentDidMount() {
@@ -19811,13 +19806,6 @@
 	    // },
 
 	    editMap(){
-	      
-	      const scriptol3gm = document.createElement("script");
-	      scriptol3gm.src = "./ol3gm.js";
-	      //script.async = true;
-	      document.body.appendChild(scriptol3gm);
-	      console.log(scriptol3gm);
-
 	      map.removeInteraction(select);
 	      map.un('click', choose2del);
 	      map.un('click', choose2rename);
@@ -20848,15 +20836,15 @@
 	        format: new ol.format.OSMXML()
 	      });
 
-	      const osmLayer = new ol.layer.Tile({
+	      osmLayer = new ol.layer.Tile({
 	        source: new ol.source.OSM(),
 	        visible: false
 	      });
-	      const gmLayer = new olgm.layer.Google({
+	      gmLayer = new olgm.layer.Google({
 	        mapTypeId: google.maps.MapTypeId.SATELLITE,
 	      });
 
-	       const map = new ol.Map({
+	      map = new ol.Map({
 	        interactions: ol.interaction.defaults().extend([
 	          new ol.interaction.DragRotateAndZoom()
 	        ]),
@@ -20891,10 +20879,10 @@
 	        }
 	      });
 
-	      // const scriptpop = document.createElement("script");
-	      // scriptpop.src = "./ol3-popup.js";
-	      // document.body.appendChild(scriptpop);
-	      // console.log(scriptpop);
+	      const scriptpop = document.createElement("script");
+	      scriptpop.src = "./ol3-popup.js";
+	      document.body.appendChild(scriptpop);
+	      console.log(scriptpop);
 
 	    },
 

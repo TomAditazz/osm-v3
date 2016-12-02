@@ -19766,8 +19766,11 @@
 	var React = __webpack_require__(1);
 	var todoStore = __webpack_require__(160);
 	var todoActions = __webpack_require__(167);
+
 	var Dropzonedemo = __webpack_require__(168);
 	var Dropjsondemo = __webpack_require__(170);
+
+
 	var choose2del;
 	var choose2rename;
 	var select;
@@ -19962,8 +19965,10 @@
 
 	    renameFeature(){
 	      map.un('click', choose2del);
+	      map.un('click', choose2rename);
 	      map.removeInteraction(select);
 	      map.removeInteraction(interactions);
+
 	      var popup = new ol.Overlay.Popup();
 	      map.addOverlay(popup);
 	      select = new ol.interaction.Select({
@@ -20847,7 +20852,15 @@
 	      gmLayer = new olgm.layer.Google({
 	        mapTypeId: google.maps.MapTypeId.SATELLITE,
 	      });
-
+	      var fill = new ol.style.Fill({
+	        //color: 'rgba(255, 204, 51, 0.2)'
+	        color: 'rgba(170, 170, 170, 0.2)'
+	      });
+	      var stroke = new ol.style.Stroke({
+	        //color: '#ffcc33',
+	        color: '#aaaaaa',
+	        width: 3
+	      });
 	      map = new ol.Map({
 	        interactions: ol.interaction.defaults().extend([
 	          new ol.interaction.DragRotateAndZoom()
@@ -20858,7 +20871,16 @@
 	          osmLayer,
 	          new ol.layer.Vector({
 	            source: vectorSource,
-	            projection: 'EPSG:3857'
+	            projection: 'EPSG:3857',
+	            style: new ol.style.Style({
+	              fill: fill,
+	              stroke: stroke,
+	              image: new ol.style.Circle({
+	                fill: fill,
+	                stroke: stroke,
+	                radius: 5
+	              }),
+	            })
 	          })
 	        ],
 	        target: 'map',

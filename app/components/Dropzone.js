@@ -3,7 +3,7 @@ var Dropzone = require('react-dropzone');
 
 
 var DropzoneDemo = React.createClass({
-    onDropzone: function (acceptedFiles, rejectedFiles) {
+    onDrop: function (acceptedFiles, rejectedFiles) {
       //console.log('Accepted files: ', acceptedFiles);
       //console.log('Accepted files: ', acceptedFiles[0].preview);
       //console.log('Rejected files: ', rejectedFiles);
@@ -23,7 +23,15 @@ var DropzoneDemo = React.createClass({
       gmLayer = new olgm.layer.Google({
         mapTypeId: google.maps.MapTypeId.SATELLITE,
       });
-
+      var fill = new ol.style.Fill({
+        //color: 'rgba(255, 204, 51, 0.2)'
+        color: 'rgba(170, 170, 170, 0.2)'
+      });
+      var stroke = new ol.style.Stroke({
+        //color: '#ffcc33',
+        color: '#aaaaaa',
+        width: 3
+      });
       map = new ol.Map({
         interactions: ol.interaction.defaults().extend([
           new ol.interaction.DragRotateAndZoom()
@@ -34,7 +42,16 @@ var DropzoneDemo = React.createClass({
           osmLayer,
           new ol.layer.Vector({
             source: vectorSource,
-            projection: 'EPSG:3857'
+            projection: 'EPSG:3857',
+            style: new ol.style.Style({
+              fill: fill,
+              stroke: stroke,
+              image: new ol.style.Circle({
+                fill: fill,
+                stroke: stroke,
+                radius: 5
+              }),
+            })
           })
         ],
         target: 'map',

@@ -30,7 +30,7 @@ var DropzoneDemo = React.createClass({
       var stroke = new ol.style.Stroke({
         //color: '#ffcc33',
         color: '#aaaaaa',
-        width: 3
+        width: 1
       });
       map = new ol.Map({
         interactions: ol.interaction.defaults().extend([
@@ -49,7 +49,7 @@ var DropzoneDemo = React.createClass({
               image: new ol.style.Circle({
                 fill: fill,
                 stroke: stroke,
-                radius: 5
+                radius: 3
               }),
             })
           })

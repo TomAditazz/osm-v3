@@ -59,10 +59,10 @@ var DropzoneDemo = React.createClass({
         }
       });
 
-      const scriptpop = document.createElement("script");
-      scriptpop.src = "./ol3-popup.js";
-      document.body.appendChild(scriptpop);
-      console.log(scriptpop);
+      // const scriptpop = document.createElement("script");
+      // scriptpop.src = "./ol3-popup.js";
+      // document.body.appendChild(scriptpop);
+      // console.log(scriptpop);
 
     },
 

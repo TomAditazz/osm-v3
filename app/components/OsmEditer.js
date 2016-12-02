@@ -41,6 +41,10 @@ var OsmEditer = React.createClass({
     // },
 
     editMap(){
+      const scriptpop = document.createElement("script");
+      scriptpop.src = "./ol3-popup.js";
+      document.body.appendChild(scriptpop);
+      console.log(scriptpop);
       map.removeInteraction(select);
       map.un('click', choose2del);
       map.un('click', choose2rename);

@@ -19806,6 +19806,10 @@
 	    // },
 
 	    editMap(){
+	      const scriptpop = document.createElement("script");
+	      scriptpop.src = "./ol3-popup.js";
+	      document.body.appendChild(scriptpop);
+	      console.log(scriptpop);
 	      map.removeInteraction(select);
 	      map.un('click', choose2del);
 	      map.un('click', choose2rename);
@@ -20879,10 +20883,10 @@
 	        }
 	      });
 
-	      const scriptpop = document.createElement("script");
-	      scriptpop.src = "./ol3-popup.js";
-	      document.body.appendChild(scriptpop);
-	      console.log(scriptpop);
+	      // const scriptpop = document.createElement("script");
+	      // scriptpop.src = "./ol3-popup.js";
+	      // document.body.appendChild(scriptpop);
+	      // console.log(scriptpop);
 
 	    },
 
